@@ -27,6 +27,7 @@ body {
   max-width: 1000px;
   padding: 2em;
   margin: auto;
+  background-color: #d9dbf1;
 }
 
 h1 {
@@ -46,6 +47,8 @@ h2 {
 .header img {
   width: 50%;
   object-fit: cover;
+  border: 5px solid #34623f;
+  border-radius: 10%;
 }
 
 .grid {
@@ -61,7 +64,7 @@ h2 {
 }
 
 .assignment a:hover {
-  color: #f06;
+  color: #358600;
 }
 
 .assignment img {
@@ -70,5 +73,15 @@ h2 {
 }
 
 .assignment p {
+  margin-top: 0.5em;
+}
+
+.divider {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  letter-spacing: 1em;
+  font-size: 1.5em;
+  color: #34623f;
   margin-top: 0.5em;
 }
