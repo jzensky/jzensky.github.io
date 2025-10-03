@@ -4,15 +4,71 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
 
-    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+    <title>Jordyn Padzensky's HCDE 439 Physical Computing Page!</title>
 
     <link href="style.css" rel="stylesheet" type="text/css" />
+
+    // Added code styling through Prism.js
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+
   </head>
   <body>
-    <h1>Example Student's Assignment 1!</h1>
+    <h1>Jordyn Padzensky's Assignment 1!</h1>
     <div class="header">
-      <img src="red-panda.jpg" />
-      <p>Here is all the documentation for assignment 1!</p>
+      <p>Here is all the documentation for assignment 1: Blink!</p>
     </div>
+    <br>
+    <p>The prompt is to create a schematic for at least 3 LEDs connected to my Arduino, implemented as a circuit on my breadboard. 
+      I wrote firmware (in a .ino file) for the circuit that makes the LEDs blink in a pattern. 
+    </p>
+    <br>
+    <h2> Here is my schematic!</h2>
+    <img src="439-A1-Schematic.jpg" />
+    <br>
+    <h2> Here is my circuit!</h2>
+    <img src="439-A1-Circuit.jpg" />
+    <br>
+    <h2> Here is my code!</h2>
+      <pre>
+        <code class="language-c">
+          // set timer variable to 1 second
+          int timer = 100; 
+
+          void setup() {
+            // for loop to initialize each pin (and associated LED) as an output:
+            for (int thisPin = 2; thisPin &lt; 5; thisPin++) {
+              pinMode(thisPin, OUTPUT);
+            }
+          }
+
+          void loop() {
+
+            // loop from the lowest pin (2) to the highest (4):
+            for (int thisPin = 2; thisPin &lt; 5; thisPin++) {
+              // turn the pin (and associated LED) on
+              digitalWrite(thisPin, HIGH); 
+              // wait 1 second
+              delay(timer); 
+              // turn the pin (and associated LED) off
+              digitalWrite(thisPin, LOW); 
+            }
+
+            // loop from the highest pin (4) to the lowest (2):
+            for (int thisPin = 4; thisPin > 1; thisPin--) {
+              // turn the pin (and associated LED) on
+              digitalWrite(thisPin, HIGH); 
+              // wait 1 second
+              delay(timer); 
+              // turn the pin (and associated LED) off
+              digitalWrite(thisPin, LOW); 
+            }
+          }
+        </code>
+      </pre>
+      <br>
+      <h2> Here is a .gif of my circuit in action!</h2>
+      <img src="439-A1-compressed-gif (1).gif" />
   </body>
 </html>
