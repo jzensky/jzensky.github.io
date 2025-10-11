@@ -45,6 +45,8 @@
       I also wired the button to a 10k ohm resistor, then ground, based on two factors:
       <li> When the switch is not pressed, it connects pin 2 to ground. This keeps the wire from "floating".</li>
       <li> When the switch is pressed, the resistor ensures that the circuit isn't sending 5V to ground, which can hurt the Arduino and power supply.</li>
+      <li> 10k is considered a standard resistor value for this button switch, 
+        as it provides enough resistance to limit the current while still being able to ensure a reliable HIGH state. </li>
       Lastly, the button is connected to 5V to ensure pin 2 will detect HIGH when the button is pressed, enabling the functionality.</p>
     <br>
     <h2> Here is my circuit in Fritzing and real life!</h2>
