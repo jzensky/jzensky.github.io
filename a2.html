@@ -76,9 +76,6 @@
           // variable for the pin number connected to the blue leg of the RBG LED
           const int bluePin = 9;
 
-          // variable to track the state of the button
-          int buttonState = 0;
-
           void setup() {
             // set buttonPin as input
             pinMode(buttonPin, INPUT);
@@ -91,77 +88,53 @@
           }
 
           void loop() {
-            // read the state of the button, assign it to tracking variable
-            buttonState = digitalRead(buttonPin);
+            // use for-loop to fade through 0-255 brightness on red 
+            for(int i = 0; i &lt; 256;i++){
+              analogWrite(redPin, i);
+              // hold value for 10ms
+              delay(10);
+              // run function to stop if button is pressed
+              checkButtonState();
+            }
+            
+            // use for-loop to fade through 0-255 brightness on green
+            for(int i = 0; i &lt; 256;i++){
+              analogWrite(greenPin, i);
+              // hold value for 10ms
+              delay(10);
+              // run function to stop if button is pressed
+              checkButtonState();
+            }
+            // use for-loop to fade through 0-255 brightness on blue
+            for(int i = 0; i &lt; 256;i++){
+              analogWrite(bluePin, i);
+              // hold value for 10ms
+              delay(10);
+              // run function to stop if button is pressed
+              checkButtonState();
+            }
+          }
 
-            // check if button is pressed
-            if (buttonState == HIGH){
-              // turn off all colors of the RBG LED if button is pressed
+          // function to turn off RGB LED while button is pressed
+          void checkButtonState() {
+            // while the button is held, turn off all colors of RBG LED
+            while (digitalRead(buttonPin) == HIGH) {
               digitalWrite(redPin, LOW);
               digitalWrite(greenPin, LOW);
               digitalWrite(bluePin, LOW);
-            } else {
-              // turn on RBG LED color cycling if button is not pressed
-              for (int i = 0; i &lt; 6; i++){
-                if (i == 0){
-                  // set colors for red
-                  analogWrite(redPin, 255);
-                  analogWrite(greenPin, 0);
-                  analogWrite(bluePin, 0);
-                  // keep color for 1 second
-                  delay(1000);
-                } else if (i == 1){
-                  // set colors for yellow
-                  analogWrite(redPin, 255);
-                  analogWrite(greenPin, 255);
-                  analogWrite(bluePin, 0);
-                  // keep color for 1 second
-                  delay(1000);
-                } else if (i == 2){
-                  // set colors for green
-                  analogWrite(redPin, 0);
-                  analogWrite(greenPin, 255);
-                  analogWrite(bluePin, 0);
-                  // keep color for 1 second
-                  delay(1000);
-                } else if (i == 3){
-                  // set colors for blue
-                  analogWrite(redPin, 0);
-                  analogWrite(greenPin, 0);
-                  analogWrite(bluePin, 255);
-                  // keep color for 1 second
-                  delay(1000);
-                } else if (i == 4){
-                  // set colors for purple
-                  analogWrite(redPin, 128);
-                  analogWrite(greenPin, 0);
-                  analogWrite(bluePin, 128);
-                  // keep color for 1 second
-                  delay(1000);
-                } else if (i == 5){
-                  // set colors for white
-                  analogWrite(redPin, 255);
-                  analogWrite(greenPin, 255);
-                  analogWrite(bluePin, 255);
-                  // keep color for 1 second
-                  delay(1000);
-                }
-              }
             }
           }
         </code>
       </pre>
       <p> In my code, I use constant variables to set the pin numbers of each positive leg of the RGB LED and the button. 
-        They are constants because they won't change, unlike the last variable.
-        The last variable tracks the state of the button, which will change between 0 and 1 based on whether or not the button is pressed.
-        In my code, I used an if-statement with a nested for-loop, with it's own nested if-statement to iterate through 6 colors on the RGB LED. 
-        While the button is pressed at the end or beginning of the loop, it will turn off the LED entirely.
-        It's worth noting that I could've made a function to set each color and delay to keep my code a bit more organized, but I decided to leave it as-is for this assignment.
-        Also, I could get rid of the for-loop and nested if-statement entirely and have the color cycling nested in a single if-statement
-         to be on if the button isn't pressed and vice-versa, but I chose this structure and functionality for the assignment criteria.</p>
+        They are constants because they won't change.
+        In my code, I used 3 for-loops, one for each RGB LED color, to cycle through the brightness of each (0-255) and create a fading effect.
+        In each loop, after adjusting the brightness based on the iterative value of the loop, I include a 10ms delay to slow the fade, and run a function to check the state of the button.
+        This function reads the value of the button, and while it's pressed, all colors of the RGB LED are turned off.
+        I used a function for this to better organize my code and reduce redundancies.</p>
       <br>
       <h2> Here is a .gif of my circuit in action!</h2>
-      <img src="A2-Final-Gif.GIF" />
+      <img src="A2-V2-Gif.GIF" />
       <br>
       <h2> And lastly, here are some additional questions and answers!</h2>
       <br>
@@ -175,30 +148,20 @@
       <br>
       <p><b>2: Given your schematic, circuit, and firmware, assuming the only thing that draws current is your LEDs, 
         how long would your circuit run if powered by a 1200 mAh battery?</b></p>
-      <p>My circuit cycles through 6 colors: red, yellow, green, blue, purple, and white, with each staying lit for 1 second.
-        If I assume each RGB LED color draws 20mA at full brightness (255) and 10mA at half brightness (128) then the current draw for each color is as follows:
-        <li>Red: 20mA</li>
-        <li>Yellow: 40mA (20mA red + 20mA green)</li>
-        <li>Green: 20mA</li>
-        <li>Blue: 20mA</li>
-        <li>Purple: 20mA (10mA red + 10mA blue)</li>
-        <li>White: 60mA (20mA red + 20mA green + 20mA blue)</li>
-        This means the total current draw for one full cycle of colors (6 seconds) is 180mA. 
-        Dividing 180mA by 6 seconds gives an average current draw of 30mA.
-        Dividing the battery capacity of 1200mAh by the average current draw of 30mA gives a total run time of 40 hours.
+      <p>My circuit cycles through the full brightness range (0-255) of 3 colors: red, green, and blue, holding each brightness for 10ms.
+        Since the cycle holds all colors and brightness values for equal durations, we can calculate the average brightness as 50%.
+        With the duty cycle at 50%, the circuit draws an average current of 10mA (half of the typical current). 
+        Dividing 1200mAh by 10mA gives a total run time of 120 hours.
       </p>
       <br>
       <p><b>3: Measure and record the actual voltage across one of your LEDs when it's on. 
         How does this compare to the theoretical forward voltage for your LED color?</b></p>
-      <p> Using a multimeter, I measured the forward voltage across each color of my RGB LED when it was on each color in the cycle:
+      <p> Using a multimeter, I measured the forward voltage across each color of my RGB LED when it was on full brightness:
         <li>Red: R=2.04V (theoretical: 1.8V), this is slightly higher than expected.</li>
-        <li>Yellow: R=2.03V (theoretical: 1.8V), this is slightly higher than expected. G=2.58V (theoretical: 1.8V), this is decently higher than expected.</li>
-        <li>Green: G=2.59V (theoretical: 1.8V), this is decently higher than expected.</li>
+        <li>Green: G=2.59V (theoretical: 1.8V), this is quite higher than expected.</li>
         <li>Blue: B=2.92V (theoretical: 3.3V), this is decently lower than expected.</li>
-        <li>Purple: R=1.01V (theoretical: 1.8V), this is decently lower than expected. B=1.46V (theoretical: 3.3V), this is decently lower than expected.</li>
-        <li>White: R=2.00V (theoretical: 1.8V), this is slightly higher than expected. G=2.56V (theoretical: 1.8V), this is decently higher than expected. B=2.89V (theoretical: 3.3V), this is decently lower than expected.</li>
-        Overall, the green pin tended to be decently higher than expected, the blue pin tended to be decently lower than expected, and the red pin varied the most.
-        Since theoretical forward voltages are typical ranges in testing conditions at a fixed current (20 mA), while the actual LED current varies with shared connections and resistor values, these differences are to be expected.
+        Since theoretical forward voltages are typical ranges in testing conditions at a fixed current (20 mA), 
+        while the actual LED current varies with shared connections, resistor values, and other factors, these differences are to be expected.
       </p>
       <br>
       <p><b>4: Did you use AI tools in completing this assignment? 
