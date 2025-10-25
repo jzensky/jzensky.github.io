@@ -22,34 +22,137 @@
     <br>
     <p>The prompt is to use the following:
       <li>more than one library,</li>
-      <li>an input and output part,</li>
-      <li>and if using analogRead(): calibration code.</li>
+      <li>and an input and output part.</li>
     </p>
     <br>
     <h2> Here is my schematic!</h2>
-    <img src="" />
-    <p> </p>
+    <img src="A4-Schematic.jpg" />
+    <p> The IR receptor is connected to pin 3, the servo motor is connected to pin 9, and the LEDs are connected to pins 7, 11, and 12.
+      The IR receptor and servo motor are powered through the same 5V connection, and all components are connected to the same ground.
+      The LEDs are red, yellow, and green, so they all have the same voltage drop of 1.8V. Using 5V minus a 1.8V drop for the LED, 
+      and 20mA (or 0.02A) of current (based on the optimal level to power these LEDs), I can use Ohm's law to calculate that each requires 160 ohms of resistance.
+      Since I don't have a 160 ohm resistor, I rounded up to 220 ohms. 
+      I rounded up because, according to Ohm's law, this would slightly reduce the current to around 14.5mA, which only slightly reduces the brightness of the LED.
+      If I rounded down, the current would increase beyond 20mA, which would risk the LED burning out.
+    </p>
     <br>
     <h2> Here is my circuit in real life and Fritzing!</h2>
     <div class="row">
       <div class="column">
-        <img src="" style="width:100%">
+        <img src="A4-Circuit.jpg" style="width:100%">
       </div>
       <div class="column">
         <img src="" style="width:100%">
       </div>
     </div>
-    <p>  </p>
+    <p> I started by connecting 5V to the power rail of the breadboard, and ground to the ground rail.
+      The IR receptor is connected to pin 3 on the Arduino, then to ground and power through the breadboard rails. 
+      The servo motor is connected to pin 9 on the Arduino, then to ground and power, also through the breadboard rails.
+      The red LED is connected to pin 11 along with a 220 ohm resistor, then to ground through the breadboard rail.
+      Similarly, the yellow LED is connected to pin 12, and the green LED is connected to pin 7. 
+      Both are also connected to their own 220 ohm resistors, then to ground through the breadboard rail.
+      Also, for the function of my circuit, I used clear tape to attach the servo motor and IR receptors to the breadboard.
+      I also taped a paper arrow to one arm of the servo motor attachment in order to emphasize my circuit's function, and for fun. </p>
     <br>
     <h2> Here is my code!</h2>
       <pre>
         <code class="language-c">
+        // Code references from:
+        // https://www.makerguides.com/ir-receiver-remote-arduino-tutorial/
+        // https://learn.sparkfun.com/tutorials/ir-control-kit-hookup-guide/all#:~:text=Download%20and%20Install%20Ken%20Shirriff%27s,Ken%20Shirriff%27s%20IRremote%20Library%20%28ZIP%29
+        // https://github.com/Arduino-IRremote/Arduino-IRremote?tab=readme-ov-file#tutorials 
+
+        // ChatGPT used for debugging
+
+        // include IR Remote library
+        #include &lt;IRremote.hpp>
+        // include Servo Motor library
+        #include &lt;Servo.h>
+
+        // define IR Receiver pin as pin 3
+        #define IRpin 3
+
+        // store codes for used buttons in 32-bit HEX values
+        const uint32_t LEFT = 0xBB44FF00;
+        const uint32_t RIGHT = 0xBC43FF00;
+        const uint32_t CENTER = 0xBF40FF00;
+
+        // store pin numbers for each LED
+        const int rLED = 11;
+        const int yLED = 12;
+        const int gLED = 7;
+
+        // store recieved code
+        uint32_t code;
+
+        // define servo
+        Servo servo;
+
+        void setup() {
+          // begin serial communication for debugging and tracking
+          Serial.begin(9600);
+          // initiate IR reciever on previously defined pin and enable LED feedback for debugging
+          IrReceiver.begin(IRpin, ENABLE_LED_FEEDBACK);
+          // attach servo variable to respective pin
+          servo.attach(9);
+          // set up LEDs as output
+          pinMode(rLED, OUTPUT);
+          pinMode(yLED, OUTPUT);
+          pinMode(gLED, OUTPUT);
+        }
+
+        void loop() {
+          // run if IR has recieved and decoded a signal
+          if (IrReceiver.decode()) {
+            // store hex value of input
+            code = IrReceiver.decodedIRData.decodedRawData;
+
+            // print code for debugging
+            Serial.print("Received code:");
+            Serial.println(code, HEX);
+
+            // resume recieving
+            IrReceiver.resume();
+          }
+
+          // if hex code corresponds to right, position motor hand right, turn on green LED, and turn off other LEDs
+          // else if hex code corresponds to left, position motor hand left, turn on red LED, and turn off other LEDs
+          // if hex code corresponds to center, position motor hand center, turn on yellow LED, and turn off other LEDs
+          // also print direction to serial monitor for decoding 
+          // and delay 30ms to give time for motor to reach position
+          if (code == RIGHT) {
+            servo.write(0);
+            Serial.println("right");
+            digitalWrite(gLED, HIGH);
+            digitalWrite(rLED, LOW);
+            digitalWrite(yLED, LOW);
+            delay(30);
+          } else if (code == LEFT) {
+            servo.write(180);
+            Serial.println("left");
+            digitalWrite(rLED, HIGH);
+            digitalWrite(gLED, LOW);
+            digitalWrite(yLED, LOW);
+            delay(30);
+          } else if (code == CENTER) {
+            servo.write(90);
+            Serial.println("center");
+            digitalWrite(yLED, HIGH);
+            digitalWrite(gLED, LOW);
+            digitalWrite(rLED, LOW);
+            delay(30);
+          } 
+        }
         </code>
       </pre>
-      <p> </p>
+      <p> Firstly, to find the HEX codes of the used buttons on the IR Remote, I used a simple program that printed the code of received input.
+        The most important line of this code was "IrReceiver.printIRResultShort(&Serial)", which is what printed the details of the received signals to the serial monitor.
+        Once I had that, I store those HEX codes in variables for later use in the main code. 
+        Further code explanations are found in the comments within the code.
+      </p>
       <br>
       <h2> Here is a .gif of my circuit in action!</h2>
-      <img src="" />
+      <img src="A4-gif.GIF" />
       <br>
       <h2> And lastly, here are some additional questions and answers!</h2>
       <br>
@@ -64,7 +167,7 @@
                 }
             </code>
         </pre>
-      <p><b>1: Draw a graph with the x-axis as time and the y-axis as voltage at pin 9 with respect to ground.</b></p>
+      <p><b>Draw a graph with the x-axis as time and the y-axis as voltage at pin 9 with respect to ground.</b></p>
       <img src="" />
       <p> </p>
       <br>
@@ -74,5 +177,18 @@
       <p><b>3: Your input device is slightly noisy, leading the measurement to randomly deviate from the true measurement up or down by 10%. How can we address this? Answer in (pseudo)code.</b></p>
       <p> </p>
       <br>
+      <p><b>4: Reflection on AI use:</b></p>
+      <p> After adding the LEDs to my circuit, it started exhibiting erratic behavior. 
+        When I couldn't figure out what was wrong, I explained my issue to ChatGPT. 
+        I gave the following prompt: "Here's my code [code inserted here]. 
+        i'm having some weird behavior. 1. the red and yellow LEDs are very dim when on 
+        2. the green LED flickers along with the IR receiver when it's not facing right/green 
+        3. when facing right, the green LED doesn't turn on, but the flickering stops. what is going on?".
+        The AI gave several debugging suggestions, two of which I followed. 
+        Firstly, I had completely forgotten to set up my LEDs as outputs.
+        Secondly, my green LED was using pin 13, which has a built-in LED.
+        The LED feedback of the IR receiver was also using the built-in LED, which caused green LED to flicker along with it. 
+        While I tend to avoid using LLMs, I am glad I decided to give it a try, as not only did this solve my problems with my circuit,
+        but I learned how to avoid and address these problems in the future.  </p>
   </body>
 </html>
