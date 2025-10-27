@@ -94,3 +94,10 @@ h2 {
   flex: 33.33%;
   padding: 5px;
 }
+
+/*.rotate-image {
+  transform: rotate(90deg);
+  vertical-align:middle;
+  margin-top: -60px;
+  margin-right: -80px;
+        }

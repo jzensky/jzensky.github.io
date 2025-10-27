@@ -39,10 +39,10 @@
     <h2> Here is my circuit in real life and Fritzing!</h2>
     <div class="row">
       <div class="column">
-        <img src="A4-Circuit.jpg" style="width:100%">
+        <img src="A4-Circuit.jpg" style="width:75%">
       </div>
       <div class="column">
-        <img src="" style="width:100%">
+        <img src="A4-fritzing.png" style="width:125%">
       </div>
     </div>
     <p> I started by connecting 5V to the power rail of the breadboard, and ground to the ground rail.
@@ -168,27 +168,37 @@
             </code>
         </pre>
       <p><b>Draw a graph with the x-axis as time and the y-axis as voltage at pin 9 with respect to ground.</b></p>
-      <img src="" />
-      <p> </p>
+      <img src="A4-Q1-graph.jpg" />
+      <p> The PWM of the servo motor works in cycles of 20ms. At a position of 0, there are 1ms pulses every cycle.
+          At a position of 90, there are 1.5ms pulses every cycle. At a position of 180, there are 2ms pulses every cycle.
+          For each pulse, the voltage goes from 0V to 5V, then back to 0V.
+          The code uses a delay of 100ms, meaning there are 5 pulses for each position value (100/20 = 5).
+          Therefore, the graph shows 5 pulses at each position, with the pulse width increasing by 1/180ms (around 0.006ms) every 100ms.
+          To graph this, I displayed the first two 100ms segments, then jump to the last segment, when the position is 180.
+          To go from 0 to 180, it should take 18.1s if each position value, including 0, takes 100ms.
+          Therefore, the jump from the second position (ending at 200ms) to the last (starting at 18s) is 17.8s.
+      </p>
       <br>
       <p><b>2: Your input device is slightly broken, leading it to give us an erroneous reading 1% of the time. How can we address this? Answer in (pseudo)code.</b></p>
-      <p> </p>
+      <p> I'd run the device for the full spectrum of conditions (e.g., light and dark for a photoresistor) and print every reading to the serial monitor.
+        Then, I'd note the average range excluding the erroneous readings, and use a constrain function to constrain every value to the average range. </p>
       <br>
       <p><b>3: Your input device is slightly noisy, leading the measurement to randomly deviate from the true measurement up or down by 10%. How can we address this? Answer in (pseudo)code.</b></p>
-      <p> </p>
+      <p> If my measurements were always off by +/- 10%, I'd use an averaging function to try and compensate. 
+        I'd start my loop by creating a total value and assigning 0. Then, inside a for-loop with a maximum iteration of 10, I'd add every value to the total.
+        Then, after the for-loop, I'd divide total by 10, assign that value to a variable called result, and print result to the serial monitor.</p>
       <br>
       <p><b>4: Reflection on AI use:</b></p>
       <p> After adding the LEDs to my circuit, it started exhibiting erratic behavior. 
-        When I couldn't figure out what was wrong, I explained my issue to ChatGPT. 
-        I gave the following prompt: "Here's my code [code inserted here]. 
-        i'm having some weird behavior. 1. the red and yellow LEDs are very dim when on 
+        When I couldn't figure out what was wrong, I explained my issue to ChatGPT with the following prompt:
+        "Here's my code [code inserted here]. i'm having some weird behavior. 
+        1. the red and yellow LEDs are very dim when on 
         2. the green LED flickers along with the IR receiver when it's not facing right/green 
         3. when facing right, the green LED doesn't turn on, but the flickering stops. what is going on?".
         The AI gave several debugging suggestions, two of which I followed. 
         Firstly, I had completely forgotten to set up my LEDs as outputs.
         Secondly, my green LED was using pin 13, which has a built-in LED.
         The LED feedback of the IR receiver was also using the built-in LED, which caused green LED to flicker along with it. 
-        While I tend to avoid using LLMs, I am glad I decided to give it a try, as not only did this solve my problems with my circuit,
-        but I learned how to avoid and address these problems in the future.  </p>
+        So, I added the proper setup code and switched the green LED to pin 7, and my problems were solved! </p>
   </body>
 </html>
