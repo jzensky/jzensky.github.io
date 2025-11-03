@@ -180,8 +180,12 @@
       </p>
       <br>
       <p><b>2: Your input device is slightly broken, leading it to give us an erroneous reading 1% of the time. How can we address this? Answer in (pseudo)code.</b></p>
-      <p> I'd run the device for the full spectrum of conditions (e.g., light and dark for a photoresistor) and print every reading to the serial monitor.
-        Then, I'd note the average range excluding the erroneous readings, and use a constrain function to constrain every value to the average range. </p>
+      <p> To handle erroneous readings, I'd first run the device and note the ranges of the readings. 
+        Based on the average difference between accurate and erroneous readings, I'd use a function to disregard any readings that are greater than, for example, 250% of the previous reading.
+        I'd start by assigning the first sensor value to a previous value variable (e.g. prevSensorVal), and the next to a current value variable (e.g. sensorVal).
+        For every next reading, I'd assign sensorVal to prevSensorVal and store the new reading in sensorVal.
+        Then, if sensorVal is greater than 2.5*prevSensorVal (250%), I'd assign the sensorVal to prevSensorVal in order to disregard the erroneous reading.
+        If needed, I could also use a similar function to disregard values below a certain threshold, like 0.1*prevSensorVal (10%).</p>
       <br>
       <p><b>3: Your input device is slightly noisy, leading the measurement to randomly deviate from the true measurement up or down by 10%. How can we address this? Answer in (pseudo)code.</b></p>
       <p> If my measurements were always off by +/- 10%, I'd use an averaging function to try and compensate. 
