@@ -54,9 +54,6 @@ function setup() {
     createCanvas(windowHeight, windowHeight);
   }
 
-  // Adjust frame rate to set movement speed
-  frameRate(10);
-
   textAlign(CENTER, CENTER);
   textSize(2);
 
@@ -65,52 +62,48 @@ function setup() {
   highScore = getItem('high score');
 
   describe(
-    'A reproduction of the arcade game Snake, in which a snake, represented by a green line on a black background, is controlled by the arrow keys. Users move the snake toward a fruit, represented by a red dot, but the snake must not hit the sides of the window or itself.'
+    'A reproduction of the arcade game Snake, in which a snake, represented by a green line on a black background, is controlled by a joystick connected to Arduino. Users move the snake toward a fruit, represented by a red dot, but the snake must not hit the sides of the window or itself.'
   );
 }
 
 function draw() {
   background(0);
-  //receiveData();  // read any data coming in from Arduino
-  drawGUI();
-  //joystickControl();
 
   // Set scale so that the game grid fills canvas
   scale(width / gridWidth, height / gridHeight);
-  if (gameStarted === false || !checkPort()) {
+  if (gameStarted === false || !checkPort()) { // added !checkPort() to show start screen if port not open
     showStartScreen();
-  } else if (gameStarted === true && checkPort()) {
+  } else if (gameStarted === true && checkPort()) { // added checkPort() to ensure port is open before running game
     // Shift over so that snake and fruit are still on screen
     // when their coordinates are 0
     translate(0.5, 0.5);
     showFruit();
     showSegments();
-    updateSegments();
+
+    // Snake game example used a set frame rate of 10
+    // For this version, I instead control speed here to avoid limiting the joystick input reading rate
+    // while still limiting the speed of the snake
+    if (frameCount % 10 == 0) { // if the current frame is divisible by 10
+      updateSegments();         // update the snake
+    }
+
     checkForCollision();
     checkForFruit();
+
+    // My additions: to read joystick, control snake, and send score back to Arduino
     receiveData();
     joystickControl();
+    sendData();
   }
-  /** My addition to show score on screen
-  push();
-  resetMatrix();
-  showScore();
-  pop();*/
-  //drawGUI();
-  //sendData();
 }
 
-// function to draw GUI
+// function to draw GUI, used for debugging
 function drawGUI() {
   /**
    * Draw a simple GUI that the user can interact with using the joystick.
    * Display joystick x, y, and switch state.
-   * Also, add up total movements/interactions and send back to Arduino.
    */
   fill(255);
-  /**text(`Joystick X: ${xVal}`, width / 2, height / 4);
-  text(`Joystick Y: ${yVal}`, width / 2, height / 4 + 50);
-  text(`Switch: ${switchVal}`, width / 2, height / 4 + 100);*/
   textSize(12);
   text(`Joystick X: ${xVal}`, 40, 10);
   text(`Joystick Y: ${yVal}`, 40, 60);
@@ -147,14 +140,14 @@ function receiveData() {
 }
 
 // function to send data back to Arduino
-//function sendData() {
+function sendData() {
   /**
-   * Send the total switch presses to the Arduino
-   * totalSwitchPresses is a global variable
+   * Send the score to the Arduino
+   * score is a global variable
    */
-    //console.log('writing:', totalSwitchPresses);
-    //port.write(totalSwitchPresses);
-//}
+    console.log('writing:', score);
+    port.write(score);
+}
 
 // Three helper functions for managing the serial connection.
 
@@ -199,6 +192,31 @@ function onConnectButtonClicked() {
   }
 }
 
+// My addition to control snake using Arduino joystick
+// When the joystick is moved, update direction accordingly
+// based on current x/y val compared to previous reading, with a deadzone of +/- 30
+function joystickControl() {
+  if (prevXVal > xVal + 30) {
+    if (direction !== 'right') {
+      direction = 'left';
+    }
+  } else if (prevXVal < xVal - 30) {
+    if (direction !== 'left') {
+      direction = 'right';
+    } 
+  } else if (prevYVal > yVal + 30) {
+    if (direction !== 'down') {
+      direction = 'up';
+    }
+  } else if (prevYVal < yVal - 30) {
+    if (direction !== 'up') {
+      direction = 'down';
+    }
+  }
+}
+
+// Game functions (alterations from example noted in code comments)
+
 function showStartScreen() {
   noStroke();
   fill(32);
@@ -210,10 +228,12 @@ function showStartScreen() {
     gridWidth / 2,
     gridHeight / 2
   );
+  // disabled no loop to ensure start screen shows until mouse pressed and port opened
   //noLoop();
 }
 
 function mousePressed() {
+  // added && checkPort() to ensure port is open before starting game
   if (gameStarted === false && checkPort()) {
     startGame();
   }
@@ -379,63 +399,4 @@ function updateFruitCoordinates() {
   let x = floor(random(gridWidth));
   let y = floor(random(gridHeight));
   fruit = createVector(x, y);
-}
-
-// When an arrow key is pressed, switch the snake's direction of movement,
-// but if the snake is already moving in the opposite direction,
-// do nothing.
-/**function keyPressed() {
-  switch (keyCode) {
-    case LEFT_ARROW:
-      if (direction !== 'right') {
-        direction = 'left';
-      }
-      break;
-    case RIGHT_ARROW:
-      if (direction !== 'left') {
-        direction = 'right';
-      }
-      break;
-    case UP_ARROW:
-      if (direction !== 'down') {
-        direction = 'up';
-      }
-      break;
-    case DOWN_ARROW:
-      if (direction !== 'up') {
-        direction = 'down';
-      }
-      break;
-  }
-}*/
-
-function joystickControl() {
-  if (prevXVal > xVal + 10) {
-    if (direction !== 'right') {
-      direction = 'left';
-    }
-  } else if (prevXVal < xVal - 10) {
-    if (direction !== 'left') {
-      direction = 'right';
-    } 
-  } else if (prevYVal > yVal + 10) {
-    if (direction !== 'down') {
-      direction = 'up';
-    }
-  } else if (prevYVal < yVal - 10) {
-    if (direction !== 'up') {
-      direction = 'down';
-    }
-  }
-}
-
-// My addition to show score on screen
-function showScore() {
-  noStroke();
-  fill(255);
-  textSize(width / 20);
-  text(
-    'Score: ' + score,
-    width*0.15, height*0.15
-  );
 }

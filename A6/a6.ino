@@ -1,16 +1,28 @@
-// Code used from ArduinoGetStarted.com https://arduinogetstarted.com/tutorials/arduino-joystick
-// Code used from https://brodycyphers.wordpress.com/2021/11/09/simple-game-with-p5-js/ 
+// Code for joystick pulls from https://arduinogetstarted.com/tutorials/arduino-joystick
+// Code for averaging pulls from https://brodycyphers.wordpress.com/2021/11/09/simple-game-with-p5-js/ 
+// Code for LCD setup from https://docs.arduino.cc/learn/electronics/lcd-displays/ 
+// LCD custom characters from https://deepbluembedded.com/lcd-custom-character-arduino/ 
 
-// Define constant variables (unchanging) for Arduino pins connected to joystick inputs and LED output
+// Include library for LCD screen
+#include <LiquidCrystal.h>
+
+// initialize library by associating LCD interface pins with respective arduino pin number
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+// define LCD custom characters
+uint8_t SmileyFaceChar[] = {0x00, 0x00, 0x0a, 0x00, 0x1f, 0x11, 0x0e, 0x00};
+uint8_t HeartChar[] = {0x00, 0x00, 0x0a, 0x15, 0x11, 0x0a, 0x04, 0x00};
+
+// define constant variables (unchanging) for Arduino pins connected to joystick inputs
 const int VRx = A0; 
 const int VRy = A1;
 const int SW = 9;
-const int LEDpin = 2;
 
 // Set number of readings to average (unchanging)
 const int numReadings = 3;
 
-// Variables to enable and tracking averaging
+// Variables to enable averaging
 int Xreadings[numReadings]; // array of readings from the analog input
 int XreadIndex = 0;         // the index of the current reading
 int Xtotal = 0;             // the running total
@@ -21,7 +33,8 @@ int YreadIndex = 0;         // the index of the current reading
 int Ytotal = 0;             // the running total
 int Yaverage = 0;           // the average
 
-int totalSwitchPresses = 0;
+// Variable to recieve and store score
+int score;
 
 void setup() {
   // begin Serial communication
@@ -31,10 +44,8 @@ void setup() {
   pinMode(VRx, INPUT);
   pinMode(VRy, INPUT);
   pinMode(SW, INPUT_PULLUP);
-  // set PinModes for LED output
-  pinMode(LEDpin, OUTPUT);
 
-  // set up array to average readings to clear jitter
+  // set up array for average readings to clear jitter
   for (int thisReading = 0; thisReading < numReadings; thisReading++) {
     Xreadings[thisReading] = 0;
   }
@@ -42,6 +53,18 @@ void setup() {
   for (int thisReading = 0; thisReading < numReadings; thisReading++) {
     Yreadings[thisReading] = 0;
   }
+
+  // set up the LCD's number of columns and rows:
+  lcd.begin(16, 2);
+  // send the custom characters to LCD's CGRAM
+  lcd.createChar(0, HeartChar);
+  lcd.createChar(1, SmileyFaceChar);
+  // clear LCD
+  lcd.clear();
+  // prints a message to the LCD.
+  lcd.print("snake game!");
+  lcd.write(byte(0));
+  lcd.write(byte(1));
 }
 
 void loop() {
@@ -76,45 +99,27 @@ void loop() {
   // calculate y average
   Yaverage = Ytotal / numReadings;
 
-  // read raw values for debugging
-  /* Xaverage = analogRead(VRx);
-  Yaverage = analogRead(VRy); */
-
   // delay in between reads for stability
-  //delay(50); 
+  delay(100); 
 
-
-  // Additional printing of values for debugging
- /* Serial.print("x0= ");
-  Serial.print(Xreadings[0]); 
-  Serial.print(", x1= ");
-  Serial.print(Xreadings[1]);
-  Serial.print(", x2= ");
-  Serial.print(Xreadings[2]);
-  Serial.print(", x3= ");
-  Serial.print(Xreadings[3]);
-  Serial.print(", numReadings =");
-  Serial.print(numReadings);
-  Serial.print(", xTotal= ");
-  Serial.println(Xtotal);
- */ 
-
-
-  // send values
+  // send joystick values
   Serial.print(Xaverage);
   Serial.print(",");
   Serial.print(Yaverage);
   Serial.print(",");
   Serial.println(switchState);
 
-  // if there's serial data
+  // if serial data arrives
   if (Serial.available()) {
-    totalSwitchPresses = Serial.read(); // read and store the data
+    // wait for the entire message to arrive
+    delay(100);
+    // read available data
+    while (Serial.available() > 0) {
+      // display data on the LCD
+      score = int(Serial.read());
+      lcd.setCursor(0, 1);
+      lcd.print(score);
+    }
   }
-
-  // once totalSwitchPresses is greater than 5, turn on LED
-  if (totalSwitchPresses > 5) {
-    digitalWrite(LEDpin, HIGH);
-  }
-
 }
+

@@ -1,3 +1,6 @@
+// This file is used for testing and debugging joystick input from an Arduino and score output back to the Arduino.
+
+
 // Global variables!
 const BAUD_RATE = 9600; // this should match the baud rate in your Arduino sketch
 let port, connectBtn;   // these are used for setting up the serial connection
