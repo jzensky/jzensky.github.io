@@ -224,7 +224,7 @@ function showStartScreen() {
   fill(255);
   textSize(2);
   text(
-    'Click to play.\nUse arrow keys to move.',
+    'Click to play.\nUse joystick to move.',
     gridWidth / 2,
     gridHeight / 2
   );
