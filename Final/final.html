@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html id = "top">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Jordyn Padzensky's HCDE 439 Physical Computing Page!</title>
+
+    <link href="../style.css" rel="stylesheet" type="text/css" />
+
+    <!-- Added code styling through Prism.js */ -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+
+  </head>
+  <body>
+    <div class="button">
+      <a href="../index.html">&#x2B9C; Home</a>
+    </div>
+    <h1>Jordyn Padzensky's Final Project!</h1>
+    <div class="header">
+      <p><b>Here is all the documentation for my Final Project: Spooky Diorama!</b></p>
+    </div>
+    <br>
+    <p>The prompt is to use our cumulative knowledge from the quarter to create a product with some input that connects to some output through digital logic. 
+        The product needs to be integrated into a prototype, rather than just be a breadboard on the table!</p>
+    <br>
+    <h3> Here is my proposal! </h3>
+    <p> The proposal for my project is available <a href="/Final Proposal/final-proposal.html">here</a> on my site, but here's an overview:</p>
+    <li> Concept: “I want to build a diorama with moving figures, LED lighting, music, and an LCD screen. It will be activated by a motion sensor, and a photoresistor will change the internal lighting based on the lighting of its surroundings.”</li>
+    <li> Contengency Plan: “I think there's a high possibility that I'll struggle to be able to hook up every component, so I plan on removing low-priority components if needed.” (foreshadowing)</li>
+    <br>
+    <h3> Here is my technical process! </h3>
+    <li> I started with the proposal, which included sketching out the diorama and roughly planning where every component would go. </li>
+    <li> I then wrote the code for all high priority components (motion sensor, LED strip, motors), hooked them up in a circuit, and tested them. </li>
+    <li> At this point, I made my first two changes from my original proposal. 
+        First, I swapped the LED strip out for an addressable one so I could change the color.
+        Second, I replaced the DC motor for a second servo motor, as I wanted controlled oscillation as opposed to full rotation. </li>
+    <li> After making these changes, I added the code for my medium-priority component (passive buzzer) and added it to my circuit. </li>
+    <li> Finally, as it was time to add the low-priority components, I realized I wouldn't have enough digital pins on my Arduino to add the LCD screen.
+        While I had several options to address this, including trying to use analog pins or another Arduino, I also knew that my total current draw was getting high.
+        The 9V power supply I was using could only provide around 1000mA-- I was already pushing that with the LEDs, and on top of this, I was running out of time.
+        Luckily, I expected this possibility and had already prioritized the components, so I decided to forgo the LCD screen in order to focus on the rest of the diorama.
+    <li> While I didn't add the LCD screen, I did add the final low-priority component: the photoresistor. 
+        Unfortunately, when making my final encasing, I realized I'd have to solder the photoresistor to longer wires for it to reach outside of the circuit compartment.
+        While I'm comfortable with soldering, I didn't have access to the necessary tools in the moment (due to the holiday break). 
+        Since it was also a low priority, I decided to leave it as is for now: reading only darkness. Spooky!
+    <li> From here, the remaining work consisted of assembling and decorating the final diorama encasing. This creative process is explained at the end of this documentation!</li>  
+    <br>
+    <h2> Here is my schematic!</h2>
+    <img src="Final-schematic.jpg" />
+    <p> All components are connected to the same ground, and all except the passive buzzer are connected to 5V through the Arduino, which is connected to 9V through its barrel jack.
+        <li>The motion sensor's output pin is connected to digital pin 2.</li>
+        <li>The servo motors' signal pins are connected to digital PWM pins 5 and 6.</li>
+        <li>The addressable LED strip's data input pin is connected to a 330 ohm resistor, then digital PWM pin 4, with a 1k uF capacitor across power and ground.
+            The resistor is added to avoid power spikes that may damage the first LEDs on the strip. 
+            I wasn't sure how many LEDs I'd be using at this point, so to be safe, I used a 330 ohm resistor, as <a href="https://en.hwlibre.com/ws2812b-led-strips-how-they-work-and-how-to-get-the-most-out-of-them/">the guide I used</a> recommended between 300-500 ohms.
+            After deciding to use only 10 LEDs, with a voltage of 5V and max current drain of 60mA per LED, I can use Ohm's Law to calculate the minimum resistor value: V(5V) = I(0.06A*10 LEDs) * R; R = 8.33 ohms. So 330 ohms is definitely safe!
+            The capacitor is also added to smooth out sudden changes in current draw, with the 1k uF value being recommended by the guide I used (linked above), which matched other trusted sources.</li> 
+        <li>The passive buzzer's positive pin is connected to digital PWM pin 10.</li>
+        <li>Finally, for the photoresistor, I used it as R1 in a voltage divider with a 10k ohm resistor (R2) to ground, connecting the junction of the two resistors to analog pin A0.
+            This voltage divider is used to create a stable reference voltage in order to read a predictable range of voltage readings based on the resistance of the photoresistor.
+            While I could test the resistance of the photoresistor to get an exact value, 10k and 1k ohm resistors are widely accepted as R2 for this circuit, with 10k being better suited for darker atmospheres.
+            So, I chose 10k ohms, knowing this component would likely stay in the dark circuit compartment.</li>
+    </p>
+    <br>
+    <h2> Here is my circuit in real life and Fritzing!</h2>
+    <div class="row">
+      <div class="column">
+        <img src="Final-circuit.jpg" style="width:100%">
+      </div>
+      <div class="column">
+        <img src="Final-fritz.png" style="width:100%">
+      </div>
+    </div>
+    <p> A couple notes: </p>
+    <p> While the photoresistor was left in the dark circuit compartment, 
+        I decided to leave it in the circuit in case I was able to solder it later, 
+        since it barely draws current and doesn't interfere with the rest of the circuit as is.
+    </p>
+    <p> The current output for the 9V power supply I used is 1000mA. 
+        I knew I'd be pushing this limit, so I calculated the max current draw of my circuit 
+        (I only plan on plugging it in for ~30s at a time, so some exceedance should be okay).
+        <li>The HC-SR501 motion sensor draws ~65mA. </li>
+        <li>The CdS-55 photoresistor is nearly negligible, drawing ~0.008mA. 
+            This was calculated using R1 measured at ~600k ohms in the circuit compartment, R2 fixed at 10k ohms, and V at 5V. 
+            With these values, Vout = 5 * (10k / (600k + 10k)) = 0.082V, and I = V/R = 5V/610k ohms = ~0.008mA. </li>
+        </li>
+        <li>While I struggled to find the exact datasheet, I believe the passive buzzer draws ~30mA.</li>
+        <li>Each servo motor draws ~700mA at stall, ~100mA running with no load, and only ~5mA at idle.</li>
+        <li>The WS2812B LED strip draws ~60mA per LED at max brightness white. With 10 LEDs, that's ~600mA max.
+            However, since the color will only be set to (148,0,211) (purple) at this point, I can calculate the current draw as follows:
+            Red: 148/255 * 20mA = ~11.6mA,
+            Green: 0/255 * 20mA = 0mA,   
+            Blue: 211/255 * 20mA = ~16.5mA,
+            Total current per LED at purple: ~28.1mA, so for 10 LEDs, that's ~281mA.</li>
+    <p> Adding all of these max current draws together, I get ~1776mA, which is over the 1000mA limit of my power supply.
+        However, in practice, the servo motors will rarely be at stall current, and the LEDs will be fading on/off.
+        I expect the real current draw to be closer to ~1200mA, which is still high but should be okay for short periods of time. (I also made sure to monitor the temperature of the components while testing! But I'd never do this again. 😅)
+        However, if I have the time to change this, I'll definitely add the 12V/2A power supply dedicated to the servo motors.
+        In the meantime, the only issue I experienced was some jittery movement in the servo motors when the LED strip was at full brightness, which isn't ideal, but manageable for testing/presenting.
+    </p>
+    <br>
+    <h2> Here is my firmware!</h2>
+      <pre>
+        <code class="language-c">
+            // Final project: Spooky Diorama!
+            // By Jordyn Padzensky
+
+            // Passive buzzer song and pitch library from https://github.com/hibit-dev/buzzer/tree/master
+
+            // ~~~~~~~~~~~~~~~~~~~~ Variables & setup for motion sensor ~~~~~~~~~~~~~~~~~~~~ //
+            const int mSensorPin = 2; // Arduino pin connected to output pin of sensor (unchanging)
+            int currMSensor = LOW; // current state of pin
+            int prevMSensor = LOW; // previous state of pin
+
+            // ~~~~~~~~~~~~~~~~~~~~ Variables & setup for servo motors ~~~~~~~~~~~~~~~~~~~~ //
+            #include &lt;Servo.h> // include servo library
+
+            Servo servo1; // create and define servo object 1
+            const int servo1Pin = 5; // Arduino pin connected to Signal pin of servo motor 1
+            const int servo1Max = 90; // Max angle for servo motor 1 when on (0-180)
+            const int servo1Min = 0; // Min angle for servo motor 1 when on (0-180)
+            const int servo1Speed = 30; // Duration of pause between servo 1 movements
+            int servo1Pos = 0; // Track position of servo 1
+            int servo1Dir = 1; // Track direction of servo 1 (+/- 1)
+            uint32_t lastServo1Move = 0; // Track time of last servo 1 movement
+
+            Servo servo2; // create and define servo object 2
+            const int servo2Pin = 6; // Arduino pin connected to Signal pin of servo motor 2
+            const int servo2Max = 120; // Max angle for servo motor 2 when on (0-180)
+            const int servo2Min = 60; // Min angle for servo motor 2 when on (0-180)
+            const int servo2Speed = 30; // Duration of pause between servo 2 movements
+            int servo2Pos = 0; // Track position of servo 2
+            int servo2Dir = 1; // Track direction of servo 2 (+/- 1)
+            uint32_t lastServo2Move = 0; // Track time of last servo 2 movement
+
+            // ~~~~~~~~~~~~~~~~~~~~ Variables & setup for multicolor LED strip ~~~~~~~~~~~~~~~~~~~~ //
+            #include &lt;Adafruit_NeoPixel.h> // include Adafruit Neopixel library
+            #define PIN_WS2812B 4  // Arduino pin that connects to WS2812B
+            #define NUM_PIXELS 10  // The number of LEDs (pixels) on WS2812B
+            #define DELAY_INTERVAL 250 // 250ms pause between each pixel
+            Adafruit_NeoPixel WS2812B(NUM_PIXELS, PIN_WS2812B, NEO_GRB + NEO_KHZ800);
+            const int fadeSpeed = 100; // set delay between pixel changes
+            int pixelPos = 0; // track pixel position
+            int fadeDir = 1; // track direction of pixel fading (+/- 1)
+            uint32_t lastLEDUpdate = 0; // track time of last LED update
+
+            // ~~~~~~~~~~~~~~~~~~~~ Variables & setup for passive buzzer ~~~~~~~~~~~~~~~~~~~~ //
+            #include &lt;pitches.h> // include pitches library
+            const int bPin = 10; // Arduino pin connected to passive buzzer (unchanging)
+            // store notes for melody in array
+            int melody[] = {
+            NOTE_C4, NOTE_C4,
+            NOTE_G4, NOTE_G4,
+            NOTE_D4, NOTE_C4,
+            NOTE_B4,
+            NOTE_C4, NOTE_D4,
+            NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_GS4, NOTE_F4, NOTE_F4,
+            NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_G4, NOTE_GS4, NOTE_G4,
+            NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_A4, NOTE_AS4, NOTE_A4, NOTE_G4, NOTE_F4,
+            NOTE_F4, NOTE_F4, NOTE_F4, NOTE_G4, NOTE_GS4, NOTE_G4, NOTE_DS4, NOTE_D4, NOTE_G4,
+            NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_A4, NOTE_G4, NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_A4, NOTE_G4,
+            NOTE_AS4, NOTE_F4, NOTE_F4, NOTE_DS4, NOTE_D4, NOTE_C4, NOTE_G4, NOTE_A4,
+            NOTE_B4, NOTE_B4, NOTE_B4, NOTE_AS4, NOTE_GS4, NOTE_B4, NOTE_B4, NOTE_B4, NOTE_B4, NOTE_B4, NOTE_AS4, NOTE_GS4,
+            NOTE_B4, NOTE_G4, NOTE_G4, NOTE_FS4, NOTE_E4, NOTE_CS4, NOTE_CS4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4,
+            NOTE_FS4, NOTE_FS4, NOTE_G4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_G4, NOTE_FS4,
+            NOTE_A3, NOTE_F4, NOTE_F4, NOTE_A3, NOTE_GS3, NOTE_A3, NOTE_B3, NOTE_CS4,
+            NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4,
+            NOTE_A4, NOTE_A4, NOTE_A4, NOTE_A4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4,
+            NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4,
+            NOTE_A4, NOTE_A4, NOTE_A4, NOTE_A4, NOTE_A4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4,
+            NOTE_DS4, NOTE_DS4, NOTE_DS4, NOTE_D4, NOTE_C4, NOTE_DS4, NOTE_DS4, NOTE_DS4, NOTE_D4, NOTE_C4,
+            NOTE_B4, NOTE_AS4, NOTE_GS4, NOTE_B4, NOTE_AS4, NOTE_GS4, NOTE_GS4, NOTE_G4, NOTE_F4, NOTE_GS4, NOTE_G4, NOTE_F4,
+            NOTE_F4, REST, REST
+
+            };
+            // store duration of notes in array
+            int durations[] = {
+            2, 2,
+            2, 2,
+            2, 2,
+            1,
+            2, 2,
+            8, 8, 8, 8, 16, 16, 8, 4,
+            16, 16, 8, 16, 16, 8, 16, 16, 8, 4,
+            8, 8, 8, 16, 16, 8, 16, 16, 4,
+            8, 8, 16, 16, 8, 8, 8, 8, 8,
+            8, 8, 16, 16, 8, 8, 8, 16, 16, 8,
+            8, 8, 8, 16, 16, 8, 8, 4,
+            8, 8, 16, 16, 8, 16, 16, 16, 16, 16, 16, 8,
+            8, 8, 8, 16, 16, 16, 16, 16, 16, 16, 16, 8,
+            8, 8, 4, 16, 16, 16, 16, 8, 8,
+            8, 8, 8, 8, 8, 16, 16, 4,
+            8, 16, 16, 8, 16, 16, 16, 16, 8, 4,
+            8, 8, 8, 8, 8, 16, 16, 4,
+            8, 16, 16, 8, 16, 16, 16, 16, 8, 4,
+            16, 16, 8, 8, 8, 16, 16, 16, 16, 4,
+            8, 8, 16, 16, 8, 8, 8, 16, 16, 8,
+            16, 16, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8,
+            4, 4, 2
+            };
+            // Note: tone() function uses one of the built in timers on the Arduino's micro-contoller and works independently of the delay() function. 
+            // Use of the tone() will interfere with PWM output on pins 3 and 11
+            int sizeOfSong = sizeof(durations)/sizeof(int); // calculate and store size of song
+            int noteIndex = 0; // track note index
+            uint32_t noteStartTime = 0; // track note start time
+            bool songFinished = false; // track whether song is completed
+
+            // ~~~~~~~~~~~~~~~~~~~~ Variables & setup for photoresistor ~~~~~~~~~~~~~~~~~~~~ //
+            const int PRthresh = 500; // threshold between night/day settings
+            const uint8_t PRPin = A0; // Arduino pin attached to photoresistor
+
+
+            void setup() {
+            Serial.begin(9600); // initialize serial
+            pinMode(mSensorPin, INPUT); // set motion sensor pin to input mode to read value from motion sensor
+            servo1.attach(servo1Pin); // set servo 1 signal pin
+            servo2.attach(servo2Pin); // set servo 2 signal pin
+            WS2812B.begin();  // initialize WS2812B multicolor LED strip
+            pinMode(bPin, OUTPUT); // set passive buzzer pin to output mode to send PWM values
+            }
+
+            void loop() {
+            prevMSensor = currMSensor; // store motion sensor old state
+            currMSensor = digitalRead(mSensorPin); // read motion sensor new state
+
+            // Read and store brightness from photoresistor (no longer using for now)
+            int analogBrightness = analogRead(PRPin);
+            Serial.print("Analog brightness: "); // print value to serial monitor for tracking and debugging
+            Serial.println(analogBrightness);
+
+            // Run when motion is detected
+            if (currMSensor == HIGH) {
+                // Run all parts continuously while song is playing
+                while (!songFinished) {
+                Serial.println("Running diorama!");
+                playSong();
+                moveServo1();
+                moveServo2();
+                lightUp(analogBrightness);
+                }
+                // Turn off all parts when song is done
+                if (songFinished) {
+                // reset diorama
+                Serial.println("Ending scene!");
+                // reset LED strip
+                lastLEDUpdate = millis();
+                pixelPos = 0;
+                fadeDir = 1;
+                WS2812B.clear(); // turn all pixels off
+                WS2812B.show();  // send the updated pixel colors to the WS2812B hardware.
+                // reset song
+                noteIndex = 0;
+                songFinished = false;
+                noteStartTime = millis();
+                // reset servos
+                servo1Pos = servo1Min;
+                servo1Dir = 1;
+                lastServo1Move = millis();
+                servo2Pos = servo2Min;
+                servo2Dir = 1;
+                lastServo2Move = millis();
+                }
+            } 
+            }
+
+            // function to turn on LED strip according to reading from photoresistor
+            void lightUp(int analogBrightness) {
+            uint32_t now = millis(); // track starting time
+
+            // use fadeSpeed to update LED strip after set duration
+            if (now - lastLEDUpdate >= fadeSpeed) {
+                pixelPos += fadeDir; // adjust pixel position by fading direction (+/-1)
+
+                // if the pixel position reaches the max or min, flip the fading direction
+                if (pixelPos >= NUM_PIXELS) {
+                fadeDir = -1;
+                }
+                if (pixelPos &lt;= 0) {
+                fadeDir = 1;
+                }
+
+                // if fade direction is negative, turn off pixel
+                // if fade direction is positive, turn on pixel based on photoresistor reading 
+                // if brightness is at or below threshold, set pixel color to purple
+                // if brightness is above threshold, set pixel color to green
+                if (fadeDir &lt; 0) {
+                WS2812B.setPixelColor(pixelPos, WS2812B.Color(0,0,0));  // turn off pixel
+                } else if (analogBrightness &lt;= PRthresh && fadeDir > 0) {
+                Serial.println("It's dark in here!"); // print message to serial for tracking and debugging
+                WS2812B.setPixelColor(pixelPos, WS2812B.Color(148,0,211));  // set pixel color to purple
+                } else if (analogBrightness > PRthresh && fadeDir > 0) {
+                Serial.println("It's bright in here!"); // print message to serial for tracking and debugging
+                WS2812B.setPixelColor(pixelPos, WS2812B.Color(255,255,255));  // set pixel color to white
+                }
+
+                WS2812B.show(); // send updated pixel color to LED strip
+                lastLEDUpdate = now; // update time of last LED update
+            }
+            }
+
+            // function to move servo 1
+            void moveServo1() {
+            uint32_t now = millis(); // track starting time
+
+            // use servo1Speed to move servo 1 after set duration
+            if (now - lastServo1Move >= servo1Speed) {
+                servo1Pos += servo1Dir; // adjust position by direction (+/-1)
+
+                // if the servo reaches a max or min, flip the direction
+                if (servo1Pos >= servo1Max) {
+                servo1Dir = -1;
+                }
+                if (servo1Pos &lt;= servo1Min) {
+                servo1Dir = 1;
+                }
+
+                servo1.write(servo1Pos); // move servo 1!
+                lastServo1Move = now; // update time of last movement
+            }
+            }
+
+            // function to move servo 2
+            void moveServo2() {
+            uint32_t now = millis(); // track starting time
+
+            // use servo2Speed to move servo 2 after set duration
+            if (now - lastServo2Move >= servo2Speed) {
+                servo2Pos += servo2Dir; // adjust position by direction (+/-1)
+
+                // if the servo reaches a max or min, flip the direction
+                if (servo2Pos >= servo2Max) {
+                servo2Dir = -1;
+                }
+                if (servo2Pos &lt;= servo2Min) {
+                servo2Dir = 1;
+                }
+
+                servo2.write(servo2Pos); // move servo 2!
+                lastServo2Move = now; // update time of last movement
+            }
+            }
+
+            // function to play song on passive buzzer
+            void playSong() {
+            if (songFinished) return; // end function if song is finished
+
+            uint32_t now = millis(); // track starting time
+            int duration = 1000/durations[noteIndex]; // to calculate the note duration, take one second (1000ms) divided by the note type.
+            int pauseBetweenNotes = duration * 1.30; // to distinguish the notes, set a minimum time between them. the note's duration + 30% seems to work well.
+
+            // move to next note after set duration
+            if (now - noteStartTime >= pauseBetweenNotes) {
+                noTone(bPin); // stop previous note
+                noteIndex++; // iterate to next note
+
+                // check if song is done-- if so, exit function.
+                if (noteIndex >= sizeOfSong) {
+                songFinished = true;
+                return;
+                }
+
+                tone(bPin, melody[noteIndex],duration); // play note
+                noteStartTime = now; // update note start time
+            }
+            }
+        </code>
+      </pre>
+    <p> When writing my code, I started with the typical methods I've used for previous projects, including using the delay() function.
+        When I went to test this, however, I realized that the delay() function stops all functions, inhibiting simultaneous operation of multiple components.
+        To solve this, I researched and found that using the millis() function to track elapsed time is a common method for non-blocking code.
+        I then rewrote my code to use this method, using functions for each component to keep my code organized, which worked well!
+    </p>
+    <p> I also added extra variables in order to easily fine tune the diorama's behavior as I built it.
+        These variables aren't necessary, but quite helpful to track and adjust everything, including the servo max/min angles, the servo and LED speed, and the number of LEDs controlled. 
+    </p>
+    <p> Lastly, in case I'm able to properly solder/wire the photoresistor in the future, I kept the code for it as well. </p>
+    <br>
+    <h2> Here is a .gif of my circuit in action!</h2>
+    <img src="Final-gif.GIF" width="540" height="960" />
+    <br>
+    <h2> And a Youtube Short of the full interaction (sound included!):</h2>
+    <iframe width="451" height="802" src="https://www.youtube.com/embed/p8iQ5FCJFXE" title="Final Project: Spooky Diorama!" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <p><a href="https://www.youtube.com/shorts/p8iQ5FCJFXE">Link to Youtube Short</a></p>
+    <br>
+    <h2> Here is my creative process!</h2>
+    <p> <li>First, I used scrap cardboard to make a rough version of the encasing. I used this to determine the final size of each piece and placement of components, planning to refine them in the final version. 
+        Unfortunately I forgot to take pictures of this step! But it was very rough, similar to the final but with lots of uneven cuts and edges, and without everything properly glued together. </li>
+        <li> Next, I took apart the rough model and measured the pieces. 
+            While I initially planned to use these measurements for a laser-cut wood version of the encasing, I ran into the same issue as the photoresistor where I lacked the proper access to tools/materials due to the holiday break and updated policies in the makerspace.</li>
+        <li> Instead, I used the measurements to cut out new pieces from paperboard, which worked extremely well! It was far more sturdy and clean-looking than my first iteration. </li>
+        <li> From here, I assembled the paperboard pieces using hot glue, making sure to leave a compartment for the circuit and openings for the servo motors, LED strip, and power supply. </li>
+        <li> Finally, I decorated the diorama with a night sky cut-out background in front of the LEDs, a ghost on one servo, and a witch on the other.</li>
+        <li> For the background, I started by making stencils for the moon and stars, tracing them on, and cutting them out with a hobby knife.
+            I then used a scrap of parchment paper to cover the back and diffuse the LEDs behind it. The LEDs are taped on (for reusability), as is the parchment.</li>
+        <li> For the ghost, I cut the shape out of regular scrap cardboard, painted it with acrylic paint, and taped it to the servo arm.</li>
+        <li> For the witch, I started with two tinfoil shapes for the body and head, then covered them in a thin layer of polymer clay and baked them. 
+            After painting the baked clay with acrylic paint, I used sparkly black foam to make the dress and hat (using small cuts and measuring each time for fit), and hot glued everything together.
+            Since the witch was heavier than the ghost and wouldn't stick properly with tape, I used hot glue to attach it to the servo arm (after testing to ensure it was removable).
+        </li>
+    </p>
+    <br>
+    <h3> And that's it! </h3>
+    <p> (For instructors:) Thank you so much for an amazing quarter, I had so much fun learning all of this! </p>
+    <br>
+    <div class="button">
+      <a href="#top">&#x2B9D; Back to Top</a>
+    </div>
+  </body>
+</html>
